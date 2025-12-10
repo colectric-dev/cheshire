@@ -10,9 +10,6 @@ Cheshire: a Python Template Repository for RMI created by Catalyst Cooperative
    :target: https://rmi-electricity.github.io/cheshire/
    :alt: GitHub Pages Status
 
-.. image:: https://coveralls.io/repos/github/rmi-electricity/cheshire/badge.svg
-   :target: https://coveralls.io/github/rmi-electricity/cheshire
-
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black>
    :alt: Any color you want, so long as it's black.

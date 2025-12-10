@@ -17,14 +17,16 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "pandas>=1.4,<2.4",
     # etoolbox provides a number of useful tools for working with data. It also includes
     # functions and infrastructure for accessing PUDL data stored on GCS so the sqlite
     # database is not requried
-    "rmi.etoolbox @ git+https://github.com/rmi/etoolbox.git",
+    "rmi.etoolbox @ git+https://github.com/colectric-dev/etoolbox.git",
 ]
 
 [project.optional-dependencies]
@@ -74,6 +76,14 @@ write_to = "src/cheshire/_version.py"
 [tool.doc8]
 max-line-length = 88
 ignore-path = "docs/_build"
+
+[tool.coverage]
+run.parallel = true
+run.branch = true
+run.source = [ "cheshire" ]
+paths.source = [ "src", ".tox/3*/**/site-packages" ]
+report.omit = [ "*/_version.py" ]
+report.show_missing = true
 
 [tool.pytest.ini_options]
 testpaths = [ "." ]
@@ -158,16 +168,35 @@ pydocstyle.convention = "google"
 "docs/conf.py" = [ "E501" ]
 "tests/*.py" = [ "S101", "SIM117", "F841", "D100", "D101", "PD901" ]
 
+
 [tool.tox]
-env_list = [ "linters", "docs", "ci" ]
+env_list = [ "linters", "docs", "prep", "3.13", "3.14", "coverage" ]
+
+[tool.tox.env.prep]
+skip_install = true
+deps = "coverage"
+commands = [ [ "coverage", "erase" ] ]
 
 [tool.tox.env_run_base]
-allowlist_externals = [ "bash", "coverage", "sphinx-build", "pytest", "ruff", "pre-commit" ]
+allowlist_externals = [ "bash", "ruff", "pre-commit" ]
 runner = "uv-venv-runner"
-extras = [ "qa", "dev", "doc" ]
+extras = [ "dev" ]
+commands = [
+    [ "coverage", "run", "--source={envsitepackagesdir}/cheshire", "-m", "pytest", "--doctest-modules", "{envsitepackagesdir}/cheshire", "tests" ],
+]
+
+[tool.tox.env.coverage]
+depends = "3.{13,14}"
+skip_install = true
+deps = "coverage"
+commands = [
+    [ "coverage", "combine" ],
+    [ "coverage", "report", "--sort=cover" ],
+]
 
 [tool.tox.env.linters]
 description = "Run the pre-commit, flake8 and bandit linters."
+extras = [ "qa" ]
 commands = [
     [ "pre-commit", "run", "--all-files", "--show-diff-on-failure", "python-no-eval" ],
     [ "pre-commit", "run", "--all-files", "--show-diff-on-failure", "python-no-log-warn" ],
@@ -182,18 +211,10 @@ commands = [
 
 [tool.tox.env.docs]
 description = "Build the HTML docs from scratch using Sphinx."
+extras = [ "doc" ]
 commands = [
     [ "bash", "-c", "rm -rf docs/_build" ],
     [ "doc8", "docs/", "README.rst" ],
     [ "rstcheck", "--config", "pyproject.toml", "--recursive", "./" ],
     [ "sphinx-build", "-b", "html", "docs", "docs/_build/html" ],
-]
-
-[tool.tox.env.ci]
-description = "un all continuous integration (CI) checks & generate test coverage."
-commands = [
-    [ "coverage", "erase" ],
-    [ "coverage", "run", "--source={envsitepackagesdir}/cheshire", "-m", "pytest", "--doctest-modules", "{envsitepackagesdir}/cheshire", "tests" ],
-    [ "coverage", "lcov", "-o", "coverage.info" ],
-    [ "coverage", "report", "--sort=cover" ],
 ]
