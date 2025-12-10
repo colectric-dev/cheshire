@@ -13,7 +13,7 @@ repos:
 
   # Other file formatting, plus common Git mistakes & text file standardization:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files # Don't accidentally commit giant files.
         args: ["--maxkb=9000"]
@@ -31,8 +31,8 @@ repos:
   ########################################################################################
 
   # Linter and formatter that replaces flake8, isort, etc.
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.11.11
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.8
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -57,18 +57,18 @@ repos:
 
   # Check for errors in restructuredtext (.rst) files under the doc hierarchy
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.2
+    rev: v2.0.0
     hooks:
       - id: doc8
-        args: [--config, pyproject.toml]
+        args: ["--config", "pyproject.toml"]
 
   # Lint any RST files and embedded code blocks for syntax / formatting errors
   - repo: https://github.com/rstcheck/rstcheck
-    rev: v6.2.4
+    rev: v6.2.5
     hooks:
       - id: rstcheck
         additional_dependencies: ["rstcheck[toml, sphinx]"]
-        args: [--config, pyproject.toml]
+        args: ["--config", "pyproject.toml"]
 
 # Configuration for pre-commit.ci
 ci:
